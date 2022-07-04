@@ -22,17 +22,6 @@ sizeStore.setSelectedSize(product.sizes[0]);
 sizeStore.setSelectedFamilySize(product.familySize[2]);
 sizeStore.setSelectedRecipeSize(product.recipeSize[0]);
 
-// sizeStore.$subscribe((mutation, state) => {
-//   // import { MutationType } from 'pinia'
-//   mutation.type; // 'direct' | 'patch object' | 'patch function'
-//   // same as cartStore.$id
-//   mutation.storeId; // 'cart'
-//   // only available with mutation.type === 'patch object'
-//   mutation.payload; // patch object passed to cartStore.$patch()
-
-//   console.log({ mutation, state, key: mutation.events.key });
-// });
-
 watch(selectedSize, (val) => {
   let recipeSize = 0;
   if (val.type === "single") {

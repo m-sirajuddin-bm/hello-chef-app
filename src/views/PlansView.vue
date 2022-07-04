@@ -2,11 +2,11 @@
 import RecipeBox from "@/components/RecipeBox.vue";
 import SizeBox from "@/components/SizeBox.vue";
 import { sizeBoxStore } from "@/store/useSizeBoxStore";
-import { onMounted } from "vue";
+import { onUnmounted } from "vue";
 
 const sizeStore = sizeBoxStore();
 
-onMounted(() => {
+onUnmounted(() => {
   sizeStore.$reset();
 });
 </script>
