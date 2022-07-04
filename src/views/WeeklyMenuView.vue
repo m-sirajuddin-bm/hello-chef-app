@@ -1,6 +1,7 @@
 <script setup>
 import RecipeCard from "@/components/RecipeCard.vue";
 import { onMounted, ref } from "vue";
+import { BASE_URL } from "@/constants/app.const.js";
 
 const products = ref([]);
 
@@ -26,12 +27,15 @@ onMounted(async () => {
 });
 
 async function getData(date) {
-  const response = await fetch(
-    `https://api.hellochef.me/api/weekly-menus/find?by=startDate&value=${date}&withNextWeek=1`,
-  );
-  const json = await response.json();
-  products.value = json.data.weeklyMenu.recipes;
-  console.log(products.value);
+  try {
+    const response = await fetch(
+      `${BASE_URL}/weekly-menus/find?by=startDate&value=${date}&withNextWeek=1`,
+    );
+    const json = await response.json();
+    products.value = json?.data.weeklyMenu.recipes;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function selectWeek(week) {
@@ -50,7 +54,7 @@ function selectWeek(week) {
           <div v-for="(week, i) in weeks" :key="i">
             <button
               :class="[
-                selectedWeek === week ? 'bg-orange-600' : '',
+                selectedWeek === week ? 'bg-orange-700' : '',
                 'p-4 bg-orange-500/60 rounded-lg font-semibold hover:bg-orange-500/80',
               ]"
               @click="selectWeek(week)"
@@ -78,6 +82,13 @@ function selectWeek(week) {
             <RecipeCard :product="product" />
           </div>
         </div>
+
+        <h3
+          v-if="!products.length"
+          class="text-3xl font-semibold text-gray-600 text-center w-full"
+        >
+          No products to display!
+        </h3>
       </div>
     </main>
   </div>
