@@ -1,6 +1,9 @@
 <script setup>
 import { sizeBoxStore } from "@/store/useSizeBoxStore";
 import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
+import singleIcon from "@/assets/icons/single.svg";
+import doubleIcon from "@/assets/icons/double.svg";
+import familyIcon from "@/assets/icons/family.svg";
 
 defineProps({
   size: {
@@ -12,6 +15,17 @@ defineProps({
     required: true,
   },
 });
+
+function getIcon(type) {
+  switch (type) {
+    case "single":
+      return singleIcon;
+    case "double":
+      return doubleIcon;
+    case "family":
+      return familyIcon;
+  }
+}
 
 const sizeStore = sizeBoxStore();
 </script>
@@ -43,11 +57,8 @@ const sizeStore = sizeBoxStore();
               >{{ size.name }}</span
             >
           </div>
-          <img
-            :src="'src/assets/icons/' + size.icon + '.svg'"
-            class="w-8"
-            alt=""
-          />
+          <img :src="getIcon(size.icon)" class="w-8" alt="" />
+          <!-- <DoneIcon /> -->
         </div>
         <div v-if="checked && size.type === 'family'">
           <div class="border-b pt-3"></div>
