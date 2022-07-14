@@ -86,8 +86,8 @@ const calculateFinalPrice = computed(() => {
 </script>
 
 <template>
-  <div class="shadow p-2 rounded-lg bg-white border flex-1 h-fit">
-    <div class="p-4 pb-8 border-b">
+  <div class="h-fit flex-1 rounded-lg border bg-white p-2 shadow">
+    <div class="border-b p-4 pb-8">
       <div class="flex justify-between">
         <h3 class="text-md font-semibold text-gray-700">
           {{ sizeStore.selectedRecipeSize }} Recipes for
@@ -103,7 +103,7 @@ const calculateFinalPrice = computed(() => {
 
       <div
         v-if="sizeStore.selectedSize.type === 'single'"
-        class="mt-3 px-4 py-3 bg-orange-50 rounded-lg flex items-center gap-2"
+        class="mt-3 flex items-center gap-2 rounded-lg bg-orange-50 px-4 py-3"
       >
         <InformationCircleIcon
           class="h-6 w-6 text-amber-700"
@@ -121,7 +121,7 @@ const calculateFinalPrice = computed(() => {
       </div>
     </div>
 
-    <div class="p-4 py-6 border-b flex flex-col gap-2">
+    <div class="flex flex-col gap-2 border-b p-4 py-6">
       <div class="flex justify-between">
         <span class="text-gray-400">Price per Serving</span>
         <div class="flex gap-1">
@@ -163,7 +163,7 @@ const calculateFinalPrice = computed(() => {
         <div class="mt-2 mb-4 rounded-md shadow-sm">
           <div class="flex">
             <span
-              class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50"
+              class="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3"
             >
               <GiftIcon class="h-6 w-6 text-gray-500" aria-hidden="true" />
             </span>
@@ -171,7 +171,7 @@ const calculateFinalPrice = computed(() => {
               type="text"
               name="discount-code"
               id="discount-code"
-              class="focus:ring-orange-500 focus:border-orange-500 flex-1 block rounded-none sm:text-sm border-gray-300 h-12"
+              class="block h-12 flex-1 rounded-none border-gray-300 focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
               placeholder="Discount Code"
               v-model="discountCode"
               @input="
@@ -183,7 +183,7 @@ const calculateFinalPrice = computed(() => {
               "
             />
             <button
-              class="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 text-gray-400 font-semibold"
+              class="inline-flex items-center rounded-r-md border border-l-0 border-gray-300 px-3 font-semibold text-gray-400"
               @click="applyDiscount()"
             >
               Apply
@@ -200,7 +200,7 @@ const calculateFinalPrice = computed(() => {
           v-for="offer in availableOffers"
           :key="offer.code"
           :value="offer"
-          class="mb-6 px-4 py-6 bg-gray-100 rounded-lg flex items-center justify-between gap-2"
+          class="mb-6 flex items-center justify-between gap-2 rounded-lg bg-gray-100 px-4 py-6"
         >
           <div>
             <span class="block font-semibold text-gray-600">{{
@@ -212,7 +212,7 @@ const calculateFinalPrice = computed(() => {
             </span>
           </div>
           <button
-            class="text-orange-500/80 font-semibold"
+            class="font-semibold text-orange-500/80"
             @click="applyDiscount(offer)"
           >
             Apply
@@ -222,7 +222,7 @@ const calculateFinalPrice = computed(() => {
 
       <div
         v-if="discountApplied"
-        class="flex items-center justify-between gap-2 mb-6"
+        class="mb-6 flex items-center justify-between gap-2"
       >
         <div>
           <span class="block font-semibold text-gray-700"
@@ -232,7 +232,7 @@ const calculateFinalPrice = computed(() => {
             You are saving AED {{ discountApplied.occurance[0].value }}
           </span>
           <button
-            class="text-[#5bc4a0] flex items-center gap-2 text-sm"
+            class="flex items-center gap-2 text-sm text-[#5bc4a0]"
             @click="openDiscountDialog = true"
           >
             <span class="underline">Learn More</span>
@@ -240,7 +240,7 @@ const calculateFinalPrice = computed(() => {
           </button>
         </div>
         <button
-          class="text-orange-500 flex items-center gap-2"
+          class="flex items-center gap-2 text-orange-500"
           @click="discountApplied = null"
         >
           <XIcon class="w-5" />
@@ -249,7 +249,7 @@ const calculateFinalPrice = computed(() => {
       </div>
 
       <button
-        class="bg-red-500 text-white p-4 w-full rounded-md font-semibold hover:bg-red-600"
+        class="w-full rounded-md bg-red-600 p-4 font-semibold text-white hover:bg-red-700"
       >
         Select this plan
       </button>
@@ -270,9 +270,9 @@ const calculateFinalPrice = computed(() => {
         <div class="fixed inset-0 bg-black bg-opacity-60 transition-opacity" />
       </TransitionChild>
 
-      <div class="fixed z-10 inset-0 overflow-y-auto">
+      <div class="fixed inset-0 z-10 overflow-y-auto">
         <div
-          class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0"
+          class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
         >
           <TransitionChild
             as="template"
@@ -284,14 +284,14 @@ const calculateFinalPrice = computed(() => {
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <DialogPanel
-              class="relative bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
+              class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg"
             >
-              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 relative">
+              <div class="relative bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <button
                   class="absolute right-6"
                   @click="openDiscountDialog = false"
                 >
-                  <div class="rounded-full p-1 border-2">
+                  <div class="rounded-full border-2 p-1">
                     <XIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
                   </div>
                 </button>
@@ -317,7 +317,7 @@ const calculateFinalPrice = computed(() => {
                       </g>
                     </svg>
                     <div
-                      class="text-xl leading-6 font-semibold text-[#5bc4a0] mt-10"
+                      class="mt-10 text-xl font-semibold leading-6 text-[#5bc4a0]"
                     >
                       '{{ discountApplied.code }}' applied!
                     </div>
@@ -325,7 +325,7 @@ const calculateFinalPrice = computed(() => {
                   </div>
                   <div class="mt-4">
                     <div
-                      class="border rounded-md w-full flex flex-col p-4 gap-3"
+                      class="flex w-full flex-col gap-3 rounded-md border p-4"
                     >
                       <div
                         class="flex justify-between"
@@ -345,8 +345,8 @@ const calculateFinalPrice = computed(() => {
                         >
                       </div>
 
-                      <div class="border-b border-2"></div>
-                      <p class="text-gray-400 text-sm">
+                      <div class="border-2 border-b"></div>
+                      <p class="text-sm text-gray-400">
                         Discount on second and third deliveries are applied
                         automatically.
                       </p>
@@ -357,7 +357,7 @@ const calculateFinalPrice = computed(() => {
               <div class="bg-gray-50 px-4 py-3 pb-6 sm:px-6">
                 <button
                   type="button"
-                  class="w-full border rounded-md p-3 border-orange-500/80 text-orange-500/80 font-semibold hover:opacity-80"
+                  class="w-full rounded-md border border-orange-500/80 p-3 font-semibold text-orange-500/80 hover:opacity-80"
                   @click="openDiscountDialog = false"
                   ref="cancelButtonRef"
                 >
