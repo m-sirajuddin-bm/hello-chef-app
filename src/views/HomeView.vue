@@ -2,13 +2,13 @@
 
 <template>
   <div
-    class="bg-gray-50 bg-[url('https://res.cloudinary.com/hellochef/image/upload/c_scale,dpr_auto,f_auto,fl_progressive,q_auto,w_auto/v1/website/V2/homepage/banner')] bg-center bg-cover bg-no-repeat w-full h-96"
+    class="h-96 w-full bg-gray-50 bg-[url('https://res.cloudinary.com/hellochef/image/upload/c_scale,dpr_auto,f_auto,fl_progressive,q_auto,w_auto/v1/website/V2/homepage/banner')] bg-cover bg-center bg-no-repeat"
   >
     <div
-      class="w-96 mx-auto py-16 px-8 flex flex-col items-center justify-between gap-5"
+      class="mx-auto flex w-96 flex-col items-center justify-between gap-5 py-16 px-8"
     >
       <h2
-        class="text-4xl font-extrabold tracking-tight text-gray-700 sm:text-4xl text-center"
+        class="text-center text-4xl font-extrabold tracking-tight text-gray-700 sm:text-4xl"
       >
         <span class="block">Say hello to a new way of cooking</span>
       </h2>
@@ -20,7 +20,7 @@
         <div class="inline-flex rounded-md shadow">
           <router-link
             to="/plans"
-            class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+            class="inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-5 py-3 text-base font-medium text-white hover:bg-red-700"
             >Get started</router-link
           >
         </div>

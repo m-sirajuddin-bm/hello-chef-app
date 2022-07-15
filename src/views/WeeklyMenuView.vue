@@ -423,8 +423,6 @@ function applyFilter() {
   if (sortApplied.value) {
     applySort();
   }
-
-  console.log(filteredProducts.value);
 }
 
 function clearFilter() {
