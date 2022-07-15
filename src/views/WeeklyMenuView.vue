@@ -511,7 +511,7 @@ function clearFilter() {
     title="Sort by"
     @onClose="openSortByDialog = false"
   >
-    <RadioGroup v-model="selectedSort" onChange="{setPlan}" class="w-full">
+    <RadioGroup v-model="selectedSort" class="w-full">
       <RadioGroupLabel class="sr-only"> Choose a sort option </RadioGroupLabel>
       <div class="flex flex-col gap-0">
         <RadioGroupOption
