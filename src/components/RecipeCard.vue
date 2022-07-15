@@ -11,6 +11,7 @@ import MeatIcon from "@/assets/icons/meat.svg";
 import QuickEasyIcon from "@/assets/icons/quick_easy.svg";
 import VeganIcon from "@/assets/icons/vegan.svg";
 import VegetarianIcon from "@/assets/icons/vegetarian.svg";
+import WeeklyClassicIcon from "@/assets/icons/weekly_classic.svg";
 import { ClockIcon } from "@heroicons/vue/outline";
 import { ref, toRefs } from "vue";
 
@@ -52,6 +53,7 @@ const featuresIcon = {
   "Family Friendly": FamilyFriendlyIcon,
   "Quick & Easy": QuickEasyIcon,
   "Chef's choice": ChefChoiceIcon,
+  "Weekly classic": WeeklyClassicIcon,
   Gourmet: GourmetIcon,
 };
 
@@ -66,6 +68,10 @@ const init = async () => {
 
   const feat = product.value.features?.map((f) => f.name);
   features.value = [...feat, ...product.value.dynamic_features];
+
+  if (product.value.weeklyClassic) {
+    features.value.push("Weekly classic");
+  }
 };
 
 init();

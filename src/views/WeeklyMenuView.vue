@@ -298,44 +298,44 @@ function selectMainProtein(item, force = false) {
   // if force, do not unselected
   if (!force) item.selected = !item.selected;
 
-  // get the product features for the selected protein
-  const proteinFeatures = Array.from(
+  // get the product features for the selected main protein
+  const filteredRecipes = products.value.filter((f) =>
+    f.mainProtein.name.toLowerCase().startsWith(item.filterType.toLowerCase()),
+  );
+  const filteredRecipeFeatures = Array.from(
     new Set(
-      flatDeep(
-        products.value
-          .filter((f) =>
-            f.mainProtein.name
-              .toLowerCase()
-              .startsWith(item.filterType.toLowerCase()),
-          )
-          .map((a) => a.features),
-      ).map((a) => a.name),
+      flatDeep(filteredRecipes.map((a) => a.features)).map((a) => a.name),
     ),
   );
 
-  // if selected, add else remove
+  // check if the are weekly classic recipes for the selected main protein
+  const weeklyClassic = filteredRecipes.filter((f) => f.weeklyClassic);
+  if (weeklyClassic.length) {
+    filteredRecipeFeatures.push("Weekly Classic");
+  }
+
   if (item.selected) {
-    // filter recipe features for the selected protein
-    proteinFeatures.forEach((pf) => {
+    // filter recipe features for the selected main protein
+    filteredRecipeFeatures.forEach((pf) => {
       if (!(pf in recipeFeatureFilter)) {
         recipeFeatureFilter[pf] = 0;
       }
       recipeFeatureFilter[pf] += 1;
     });
   } else {
-    // clear filter of recipe features for the unselected protein
-    proteinFeatures.forEach((pf) => {
+    // clear filter of recipe features for the unselected main protein
+    filteredRecipeFeatures.forEach((pf) => {
       if (pf in recipeFeatureFilter) {
         recipeFeatureFilter[pf] -= 1;
       }
 
       // if the recipe feature filter is 0, then remove from the object
-      // this is need to reset the recipe features filter if all the proteins are unselected
+      // this is need to reset the recipe features filter if all the main proteins are unselected
       if (recipeFeatureFilter[pf] === 0) delete recipeFeatureFilter[pf];
     });
   }
 
-  // if all the proteins are unselected, then enabled all the recipe features
+  // if all the main protein are unselected, then enabled all the recipe features
   if (!Object.keys(recipeFeatureFilter).length) {
     recipeFeatureFilters.value.forEach((f) => {
       f.disabled = false;
@@ -343,7 +343,7 @@ function selectMainProtein(item, force = false) {
     return;
   }
 
-  // filter recipe features based on the protein selected
+  // filter recipe features based on the selected main protein
   recipeFeatureFilters.value.forEach((f) => {
     f.disabled = !recipeFeatureFilter[f.filterType];
     // if the item is disabled but already selected then unselect
@@ -422,7 +422,9 @@ function applyFilter() {
 
     filteredProducts.value = productsToFilter.value.filter((product) => {
       return featureFilters.some((filterItem) => {
-        return product.features.map((m) => m.name).includes(filterItem);
+        return filterItem === "Weekly Classic"
+          ? product.weeklyClassic
+          : product.features.map((m) => m.name).includes(filterItem);
       });
     });
   }
