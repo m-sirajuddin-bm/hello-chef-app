@@ -1,19 +1,8 @@
 <script setup>
-import CalorieSmartIcon from "@/assets/icons/calorie_smart.svg";
-import ChefChoiceIcon from "@/assets/icons/chef_choice.svg";
-import ChickenIcon from "@/assets/icons/chicken.svg";
-import FamilyFriendlyIcon from "@/assets/icons/family_friendly.svg";
 import FilterIcon from "@/assets/icons/filter.svg";
-import FishIcon from "@/assets/icons/fish.svg";
-import GourmetIcon from "@/assets/icons/gourmet.svg";
-import LowCarbIcon from "@/assets/icons/low_carb.svg";
-import MeatIcon from "@/assets/icons/meat.svg";
-import QuickEasyIcon from "@/assets/icons/quick_easy.svg";
-import VeganIcon from "@/assets/icons/vegan.svg";
-import WeeklyClassicIcon from "@/assets/icons/weekly_classic.svg";
 import FlatButton from "@/components/FlatButton.vue";
 import RecipeCard from "@/components/RecipeCard.vue";
-import { BASE_URL } from "@/constants/app.const.js";
+import { BASE_URL, FILTERS, SORTS, WEEKS } from "@/constants";
 import { flatDeep } from "@/utils";
 import {
   Dialog,
@@ -33,25 +22,28 @@ onMounted(async () => {
 
 const products = ref([]);
 const filteredProducts = ref([]);
-const openFilterDialog = ref(false);
-const openSortByDialog = ref(false);
-const filterApplied = ref(false);
 
-const weeks = ref([
-  {
-    label: "7 - 13",
-    date: "2022-07-07",
-  },
-  {
-    label: "14 - 20",
-    date: "2022-07-14",
-  },
-  {
-    label: "21 - 27",
-    date: "2022-07-21",
-  },
-]);
-const selectedWeek = ref(weeks.value[0]);
+const weeks = ref(WEEKS);
+const selectedWeek = ref(WEEKS[0]);
+
+const openSortByDialog = ref(false);
+const sortApplied = ref(false);
+const sorts = ref(SORTS);
+const selectedSort = ref(SORTS[0]);
+watch(selectedSort, (value) => {
+  applySort(value);
+});
+
+const openFilterDialog = ref(false);
+const filterApplied = ref(false);
+const filters = ref(FILTERS);
+const mainProteinsFilters = ref(
+  filters.value.filter((f) => f.type === "protein"),
+);
+const recipeFeatureFilters = ref(
+  filters.value.filter((f) => f.type === "feature"),
+);
+let recipeFeatureFilter = {};
 
 async function getData(date) {
   try {
@@ -92,37 +84,6 @@ function selectWeek(week) {
   selectedWeek.value = week;
 }
 
-const sortCriteria = ref([
-  {
-    label: "Default",
-    type: "default",
-  },
-  {
-    label: "Calories: Low to High",
-    type: "Calories",
-  },
-  {
-    label: "Carbs: Low to High",
-    type: "Carbs",
-  },
-  {
-    label: "Cooking Time: Low to High",
-    type: "CookingTime",
-  },
-  {
-    label: "Protein: High to Low",
-    type: "Protein",
-  },
-]);
-
-const selectedSort = ref(sortCriteria.value[0]);
-
-const sortApplied = ref(false);
-
-watch(selectedSort, (value) => {
-  applySort(value);
-});
-
 function applySort(value = null) {
   value = value ? value : selectedSort.value;
 
@@ -157,118 +118,6 @@ function applySort(value = null) {
   openSortByDialog.value = false;
 }
 
-let recipeFeatureFilter = {};
-
-const filters = ref([
-  {
-    type: "protein",
-    label: "Veg/Vegan",
-    filterType: "Veg",
-    icon: VeganIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-  {
-    type: "protein",
-    label: "Fish",
-    filterType: "Fish",
-    icon: FishIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-  {
-    type: "protein",
-    label: "Chicken",
-    filterType: "Chicken",
-    icon: ChickenIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-  {
-    type: "protein",
-    label: "Meat",
-    filterType: "Meat",
-    icon: MeatIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-  {
-    type: "feature",
-    label: "Low carb",
-    filterType: "Low Carb",
-    icon: LowCarbIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-  {
-    type: "feature",
-    label: "Calorie smart",
-    filterType: "Calorie smart",
-    icon: CalorieSmartIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-  {
-    type: "feature",
-    label: "Family friendly",
-    filterType: "Family Friendly",
-    icon: FamilyFriendlyIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-  {
-    type: "feature",
-    label: "Quick & Easy",
-    filterType: "Quick & Easy",
-    icon: QuickEasyIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-  {
-    type: "feature",
-    label: "Weekly classic",
-    filterType: "Weekly Classic",
-    icon: WeeklyClassicIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-  {
-    type: "feature",
-    label: "Chef's choice",
-    filterType: "Chef's choice",
-    icon: ChefChoiceIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-  {
-    type: "feature",
-    label: "Gourmet",
-    filterType: "Gourmet",
-    icon: GourmetIcon,
-    selected: false,
-    disabled: false,
-    filtered: false,
-  },
-]);
-
-const mainProteinsFilters = ref(
-  filters.value.filter((f) => f.type === "protein"),
-);
-
-const recipeFeatureFilters = ref(
-  filters.value.filter((f) => f.type === "feature"),
-);
-
 function handleOpenFilterDialog() {
   openFilterDialog.value = true;
 
@@ -283,6 +132,13 @@ function handleOpenFilterDialog() {
       selectMainProtein(item, true);
     }
   });
+}
+
+function handleCloseFilterDialog() {
+  openFilterDialog.value = false;
+  if (!filterApplied.value) {
+    clearFilter();
+  }
 }
 
 function handleFilterShortcut(item) {
@@ -367,13 +223,6 @@ function selectMainProtein(item, force = false) {
 
 function selectRecipeFeature(item) {
   item.selected = !item.selected;
-}
-
-function handleCloseFilterDialog() {
-  openFilterDialog.value = false;
-  if (!filterApplied.value) {
-    clearFilter();
-  }
 }
 
 function clearAllFilter() {
@@ -769,7 +618,7 @@ function clearFilter() {
                   <div class="flex flex-col gap-0">
                     <RadioGroupOption
                       as="template"
-                      v-for="(item, i) in sortCriteria"
+                      v-for="(item, i) in sorts"
                       :key="i"
                       :value="item"
                       v-slot="{ checked }"
