@@ -1,6 +1,7 @@
 <script setup>
-import CalorieSmartIcon from "@/assets/icons/calorie_smart.svg";
 import CalorieIcon from "@/assets/icons/calorie.svg";
+import CalorieSmartIcon from "@/assets/icons/calorie_smart.svg";
+import ChefChoiceIcon from "@/assets/icons/chef_choice.svg";
 import ChickenIcon from "@/assets/icons/chicken.svg";
 import FamilyFriendlyIcon from "@/assets/icons/family_friendly.svg";
 import FishIcon from "@/assets/icons/fish.svg";
@@ -10,8 +11,8 @@ import MeatIcon from "@/assets/icons/meat.svg";
 import QuickEasyIcon from "@/assets/icons/quick_easy.svg";
 import VeganIcon from "@/assets/icons/vegan.svg";
 import VegetarianIcon from "@/assets/icons/vegetarian.svg";
-import { ref, toRefs } from "vue";
 import { ClockIcon } from "@heroicons/vue/outline";
+import { ref, toRefs } from "vue";
 
 const props = defineProps({
   product: {
@@ -50,6 +51,7 @@ const featuresIcon = {
   "Calorie smart": CalorieSmartIcon,
   "Family Friendly": FamilyFriendlyIcon,
   "Quick & Easy": QuickEasyIcon,
+  "Chef's choice": ChefChoiceIcon,
   Gourmet: GourmetIcon,
 };
 

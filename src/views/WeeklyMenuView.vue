@@ -1,5 +1,6 @@
 <script setup>
 import CalorieSmartIcon from "@/assets/icons/calorie_smart.svg";
+import ChefChoiceIcon from "@/assets/icons/chef_choice.svg";
 import ChickenIcon from "@/assets/icons/chicken.svg";
 import FamilyFriendlyIcon from "@/assets/icons/family_friendly.svg";
 import FilterIcon from "@/assets/icons/filter.svg";
@@ -78,7 +79,7 @@ async function getData(date) {
       applySort();
     }
 
-    // console.log(products.value);
+    // console.log(products.value.map((m) => m.features));
   } catch (error) {
     console.error(error);
   }
@@ -234,6 +235,15 @@ const filters = ref([
     label: "Weekly classic",
     filterType: "Weekly Classic",
     icon: WeeklyClassicIcon,
+    selected: false,
+    disabled: false,
+    filtered: false,
+  },
+  {
+    type: "feature",
+    label: "Chef's choice",
+    filterType: "Chef's choice",
+    icon: ChefChoiceIcon,
     selected: false,
     disabled: false,
     filtered: false,
