@@ -64,8 +64,9 @@ async function getData(date) {
     if (filterApplied.value) {
       // we need to retrigger select main protein for new set of products
       // to update the recipe features based on the selected main protein
+      recipeFeatureFilter = {};
       mainProteinsFilters.value.forEach((f) => {
-        if (f.selected) {
+        if (f.filtered) {
           selectMainProtein(f, true);
         }
       });
@@ -87,6 +88,73 @@ function selectWeek(week) {
   getData(week.date);
   selectedWeek.value = week;
 }
+
+const sortCriteria = ref([
+  {
+    label: "Default",
+    type: "default",
+  },
+  {
+    label: "Calories: Low to High",
+    type: "Calories",
+  },
+  {
+    label: "Carbs: Low to High",
+    type: "Carbs",
+  },
+  {
+    label: "Cooking Time: Low to High",
+    type: "CookingTime",
+  },
+  {
+    label: "Protein: High to Low",
+    type: "Protein",
+  },
+]);
+
+const selectedSort = ref(sortCriteria.value[0]);
+
+const sortApplied = ref(false);
+
+watch(selectedSort, (value) => {
+  applySort(value);
+});
+
+function applySort(value = null) {
+  value = value ? value : selectedSort.value;
+
+  let productsToSort = filterApplied.value ? filteredProducts : products;
+  sortApplied.value = true;
+
+  switch (value.type) {
+    case "Calories":
+    case "Carbs":
+      productsToSort.value.sort(
+        (a, b) =>
+          a.nutritions.find((f) => f.name === value.type).value -
+          b.nutritions.find((f) => f.name === value.type).value,
+      );
+      break;
+    case "Protein":
+      productsToSort.value.sort(
+        (a, b) =>
+          b.nutritions.find((f) => f.name === value.type).value -
+          a.nutritions.find((f) => f.name === value.type).value,
+      );
+      break;
+    case "CookingTime":
+      productsToSort.value.sort((a, b) => a.cookingTime - b.cookingTime);
+      break;
+    default:
+      productsToSort.value.sort((a, b) => a.number - b.number);
+      sortApplied.value = false;
+      break;
+  }
+
+  openSortByDialog.value = false;
+}
+
+let recipeFeatureFilter = {};
 
 const filters = ref([
   {
@@ -180,77 +248,31 @@ const filters = ref([
     filtered: false,
   },
 ]);
+
 const mainProteinsFilters = ref(
   filters.value.filter((f) => f.type === "protein"),
 );
+
 const recipeFeatureFilters = ref(
   filters.value.filter((f) => f.type === "feature"),
 );
 
-const sortCriteria = ref([
-  {
-    label: "Default",
-    type: "default",
-  },
-  {
-    label: "Calories: Low to High",
-    type: "Calories",
-  },
-  {
-    label: "Carbs: Low to High",
-    type: "Carbs",
-  },
-  {
-    label: "Cooking Time: Low to High",
-    type: "CookingTime",
-  },
-  {
-    label: "Protein: High to Low",
-    type: "Protein",
-  },
-]);
-const selectedSort = ref(sortCriteria.value[0]);
-const sortApplied = ref(false);
+function handleOpenFilterDialog() {
+  openFilterDialog.value = true;
 
-watch(selectedSort, (value) => {
-  applySort(value);
-});
-
-function applySort(value = null) {
-  value = value ? value : selectedSort.value;
-
-  let productsToSort = filterApplied.value ? filteredProducts : products;
-  sortApplied.value = true;
-
-  switch (value.type) {
-    case "Calories":
-    case "Carbs":
-      productsToSort.value.sort(
-        (a, b) =>
-          a.nutritions.find((f) => f.name === value.type).value -
-          b.nutritions.find((f) => f.name === value.type).value,
-      );
-      break;
-    case "Protein":
-      productsToSort.value.sort(
-        (a, b) =>
-          b.nutritions.find((f) => f.name === value.type).value -
-          a.nutritions.find((f) => f.name === value.type).value,
-      );
-      break;
-    case "CookingTime":
-      productsToSort.value.sort((a, b) => a.cookingTime - b.cookingTime);
-      break;
-    default:
-      productsToSort.value.sort((a, b) => a.number - b.number);
-      sortApplied.value = false;
-      break;
-  }
-
-  openSortByDialog.value = false;
+  // set all the filtered as selected
+  // this is to make sure, only filtered are selected
+  // otherwise user can simply select the filter and
+  // close the dialog without applying filter
+  recipeFeatureFilter = {};
+  mainProteinsFilters.value.forEach((item) => {
+    item.selected = item.filtered;
+    if (item.selected) {
+      selectMainProtein(item, true);
+    }
+  });
 }
 
-let recipeFeatureFilter = {};
 function selectMainProtein(item, force = false) {
   // if force, do not unselected
   if (!force) item.selected = !item.selected;
@@ -314,19 +336,7 @@ function selectRecipeFeature(item) {
   item.selected = !item.selected;
 }
 
-function handleOpenFilterDialog() {
-  openFilterDialog.value = true;
-
-  // set all the filtered as selected
-  // this is to make sure, only filtered are selected
-  // otherwise user can simply select the filter and
-  // close the dialog without applying filter
-  filters.value.forEach((item) => {
-    item.selected = item.filtered;
-  });
-}
-
-function closeFilterDialog() {
+function handleCloseFilterDialog() {
   openFilterDialog.value = false;
   if (!filterApplied.value) {
     clearFilter();
@@ -348,8 +358,8 @@ function applyFilter() {
   });
 
   // get the protein filters mapped to filterType
-  const proteinFilters = filters.value
-    .filter((f) => f.selected && f.type === "protein")
+  const proteinFilters = mainProteinsFilters.value
+    .filter((f) => f.selected)
     .map((m) => {
       // set filtered to true to reselect the filtered after closing the filter dialog
       m.filtered = true;
@@ -357,8 +367,8 @@ function applyFilter() {
     });
 
   // get feature filters mapped to filterType
-  const featureFilters = filters.value
-    .filter((f) => f.selected && f.type === "feature")
+  const featureFilters = recipeFeatureFilters.value
+    .filter((f) => f.selected)
     .map((m) => {
       // set filtered to true to reselect the filtered after closing the filter dialog
       m.filtered = true;
@@ -402,6 +412,8 @@ function applyFilter() {
   if (sortApplied.value) {
     applySort();
   }
+
+  console.log(filteredProducts.value);
 }
 
 function clearFilter() {
@@ -513,13 +525,11 @@ function clearFilter() {
           </div>
         </div>
 
-        <div class="py-12">
-          <h3
-            v-if="
-              (filterApplied && !filteredProducts.length) || !products.length
-            "
-            class="w-full text-center text-3xl font-semibold text-gray-600"
-          >
+        <div
+          v-if="(filterApplied && !filteredProducts.length) || !products.length"
+          class="py-12"
+        >
+          <h3 class="w-full text-center text-3xl font-semibold text-gray-600">
             No recipes to display!
           </h3>
         </div>
@@ -528,7 +538,7 @@ function clearFilter() {
   </div>
 
   <TransitionRoot as="template" :show="openFilterDialog">
-    <Dialog as="div" class="relative z-10" @close="closeFilterDialog()">
+    <Dialog as="div" class="relative z-10" @close="handleCloseFilterDialog()">
       <TransitionChild
         as="template"
         enter="ease-out duration-300"
@@ -562,7 +572,10 @@ function clearFilter() {
               >
                 <div class="flex items-center justify-center">
                   <h3 class="text-xl font-semibold text-gray-900">Filter by</h3>
-                  <button class="absolute right-6" @click="closeFilterDialog()">
+                  <button
+                    class="absolute right-6"
+                    @click="handleCloseFilterDialog()"
+                  >
                     <div class="rounded-full border-2 p-1">
                       <XIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
                     </div>
