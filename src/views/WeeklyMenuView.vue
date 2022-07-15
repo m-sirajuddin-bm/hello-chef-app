@@ -64,13 +64,14 @@ async function getData(date) {
     // triger filter, if applied
     if (filterApplied.value) {
       // we need to retrigger select main protein for new set of products
-      // to update the recipe features based on the selected main protein
+      // to filter the recipe features based on the selected main protein
       recipeFeatureFilter = {};
       mainProteinsFilters.value.forEach((f) => {
         if (f.filtered) {
           selectMainProtein(f, true);
         }
       });
+
       applyFilter();
     }
 
@@ -79,7 +80,8 @@ async function getData(date) {
       applySort();
     }
 
-    // console.log(products.value.map((m) => m.features));
+    // console.log(products.value);
+    // console.log(products.value.map((m) => m.dynamic_features));
   } catch (error) {
     console.error(error);
   }
@@ -206,7 +208,7 @@ const filters = ref([
   {
     type: "feature",
     label: "Calorie smart",
-    filterType: "Calorie Smart",
+    filterType: "Calorie smart",
     icon: CalorieSmartIcon,
     selected: false,
     disabled: false,
@@ -293,8 +295,6 @@ function handleFilterShortcut(item) {
 }
 
 function selectMainProtein(item, force = false) {
-  if (item.type !== "protein") return;
-
   // if force, do not unselected
   if (!force) item.selected = !item.selected;
 
@@ -302,11 +302,23 @@ function selectMainProtein(item, force = false) {
   const filteredRecipes = products.value.filter((f) =>
     f.mainProtein.name.toLowerCase().startsWith(item.filterType.toLowerCase()),
   );
-  const filteredRecipeFeatures = Array.from(
+
+  // check for features
+  let filteredRecipeFeatures = Array.from(
     new Set(
       flatDeep(filteredRecipes.map((a) => a.features)).map((a) => a.name),
     ),
   );
+
+  // check for dynamic features
+  let dynamicFeatures = filteredRecipes
+    .map((m) => m.dynamic_features)
+    .filter((f) => f.length);
+
+  if (dynamicFeatures.length) {
+    dynamicFeatures = Array.from(new Set(flatDeep(dynamicFeatures)));
+    filteredRecipeFeatures = [...filteredRecipeFeatures, ...dynamicFeatures];
+  }
 
   // check if the are weekly classic recipes for the selected main protein
   const weeklyClassic = filteredRecipes.filter((f) => f.weeklyClassic);
@@ -420,13 +432,15 @@ function applyFilter() {
     // else filter from main products
     const productsToFilter = proteinFilterApplied ? filteredProducts : products;
 
-    filteredProducts.value = productsToFilter.value.filter((product) => {
-      return featureFilters.some((filterItem) => {
-        return filterItem === "Weekly Classic"
-          ? product.weeklyClassic
-          : product.features.map((m) => m.name).includes(filterItem);
-      });
-    });
+    filteredProducts.value = productsToFilter.value.filter((product) =>
+      featureFilters.some(
+        (filterItem) =>
+          filterItem === "Weekly Classic"
+            ? product.weeklyClassic // weekly classic filter
+            : product.features.map((m) => m.name).includes(filterItem) || // features filter
+              product.dynamic_features.includes(filterItem), // dynamic features filter
+      ),
+    );
   }
 
   filterApplied.value = true;
