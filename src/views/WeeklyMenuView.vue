@@ -4,17 +4,10 @@ import FlatButton from "@/components/FlatButton.vue";
 import RecipeCard from "@/components/RecipeCard.vue";
 import { BASE_URL, FILTERS, SORTS, WEEKS } from "@/constants";
 import { flatDeep } from "@/utils";
-import {
-  Dialog,
-  DialogPanel,
-  RadioGroup,
-  RadioGroupLabel,
-  RadioGroupOption,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
+import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
 import { ChevronDownIcon, XIcon } from "@heroicons/vue/outline";
 import { onMounted, ref, watch } from "vue";
+import CustomDialog from "@/components/CustomDialog.vue";
 
 onMounted(async () => {
   await getData(selectedWeek.value.date);
@@ -444,218 +437,117 @@ function clearFilter() {
     </main>
   </div>
 
-  <TransitionRoot as="template" :show="openFilterDialog">
-    <Dialog as="div" class="relative z-10" @close="handleCloseFilterDialog()">
-      <TransitionChild
-        as="template"
-        enter="ease-out duration-300"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="ease-in duration-300"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
-      >
-        <div class="fixed inset-0 bg-black bg-opacity-60 transition-opacity" />
-      </TransitionChild>
-
-      <div class="fixed inset-0 z-10 overflow-y-auto">
-        <div
-          class="flex min-h-full items-end justify-center text-center sm:items-center"
+  <CustomDialog
+    :show="openFilterDialog"
+    title="Filter by"
+    @onBackDropClick="openFilterDialog = false"
+    @onClose="handleCloseFilterDialog()"
+  >
+    <div class="flex flex-col">
+      <h3 class="mb-2 text-lg font-semibold text-gray-700">Main Protein</h3>
+      <div class="flex flex-row flex-wrap gap-3">
+        <FlatButton
+          v-for="(item, i) in mainProteinsFilters"
+          :key="i"
+          :selected="!item.disabled && item.selected"
+          :disabled="item.disabled"
+          @onClick="selectMainProtein(item)"
         >
-          <TransitionChild
-            as="template"
-            enter="ease-out duration-300"
-            enter-from="opacity-0"
-            enter-to="opacity-100"
-            leave="ease-in duration-300"
-            leave-from="opacity-100"
-            leave-to="opacity-0"
-          >
-            <DialogPanel
-              class="relative w-full transform overflow-hidden rounded-t-2xl bg-white text-left shadow-xl transition-all sm:max-w-lg sm:rounded-2xl"
-            >
-              <div
-                class="relative flex flex-col gap-4 bg-white px-6 py-5 sm:p-6 sm:pb-4"
-              >
-                <div class="flex items-center justify-center">
-                  <h3 class="text-xl font-semibold text-gray-900">Filter by</h3>
-                  <button
-                    class="absolute right-6"
-                    @click="handleCloseFilterDialog()"
-                  >
-                    <div class="rounded-full border-2 p-1">
-                      <XIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
-                    </div>
-                  </button>
-                </div>
-
-                <div class="flex flex-col">
-                  <h3 class="mb-2 text-lg font-semibold text-gray-700">
-                    Main Protein
-                  </h3>
-                  <div class="flex flex-row flex-wrap gap-3">
-                    <FlatButton
-                      v-for="(item, i) in mainProteinsFilters"
-                      :key="i"
-                      :selected="!item.disabled && item.selected"
-                      :disabled="item.disabled"
-                      @onClick="selectMainProtein(item)"
-                    >
-                      <img
-                        :src="item.icon"
-                        :class="['-ml-1 mr-1 h-5 w-5 rounded text-gray-500']"
-                        alt=""
-                      />
-                      {{ item.label }}
-                    </FlatButton>
-                  </div>
-                </div>
-
-                <div class="border-b"></div>
-
-                <div class="flex flex-col">
-                  <h3 class="mb-2 text-lg font-semibold text-gray-700">
-                    Recipe Features
-                  </h3>
-                  <div class="flex flex-row flex-wrap gap-3">
-                    <FlatButton
-                      v-for="(item, i) in recipeFeatureFilters"
-                      :key="i"
-                      :selected="!item.disabled && item.selected"
-                      :disabled="item.disabled"
-                      @onClick="selectRecipeFeature(item)"
-                    >
-                      <img
-                        :src="item.icon"
-                        class="-ml-1 mr-1 h-5 w-5 rounded text-gray-500"
-                        alt=""
-                      />
-                      {{ item.label }}
-                    </FlatButton>
-                  </div>
-                </div>
-
-                <div class="flex gap-4 bg-gray-50">
-                  <button
-                    type="button"
-                    class="w-full rounded-md border border-orange-500/80 p-3 font-semibold text-orange-500/80 hover:opacity-80"
-                    @click="clearAllFilter()"
-                    ref="cancelButtonRef"
-                  >
-                    Clear all
-                  </button>
-
-                  <button
-                    type="button"
-                    class="w-full items-center justify-center rounded-md border border-transparent bg-red-600 px-5 py-3 text-base font-medium text-white hover:bg-red-700"
-                    @click="applyFilter()"
-                    ref="cancelButtonRef"
-                  >
-                    Apply filters
-                  </button>
-                </div>
-              </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
+          <img
+            :src="item.icon"
+            :class="['-ml-1 mr-1 h-5 w-5 rounded text-gray-500']"
+            alt=""
+          />
+          {{ item.label }}
+        </FlatButton>
       </div>
-    </Dialog>
-  </TransitionRoot>
+    </div>
 
-  <TransitionRoot as="template" :show="openSortByDialog">
-    <Dialog as="div" class="relative z-10" @close="openSortByDialog = false">
-      <TransitionChild
-        as="template"
-        enter="ease-out duration-300"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="ease-in duration-300"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
-      >
-        <div class="fixed inset-0 bg-black bg-opacity-60 transition-opacity" />
-      </TransitionChild>
+    <div class="border-b"></div>
 
-      <div class="fixed inset-0 z-10 overflow-y-auto">
-        <div
-          class="flex min-h-full items-end justify-center text-center sm:items-center"
+    <div class="flex flex-col">
+      <h3 class="mb-2 text-lg font-semibold text-gray-700">Recipe Features</h3>
+      <div class="flex flex-row flex-wrap gap-3">
+        <FlatButton
+          v-for="(item, i) in recipeFeatureFilters"
+          :key="i"
+          :selected="!item.disabled && item.selected"
+          :disabled="item.disabled"
+          @onClick="selectRecipeFeature(item)"
         >
-          <TransitionChild
-            as="template"
-            enter="ease-out duration-300"
-            enter-from="opacity-0"
-            enter-to="opacity-100"
-            leave="ease-in duration-300"
-            leave-from="opacity-100"
-            leave-to="opacity-0"
-          >
-            <DialogPanel
-              class="relative w-full transform overflow-hidden rounded-t-2xl bg-white text-left shadow-xl transition-all sm:max-w-lg sm:rounded-2xl"
-            >
-              <div
-                class="relative flex flex-col gap-4 bg-white px-6 py-5 sm:p-6 sm:pb-4"
-              >
-                <div class="flex items-center justify-center">
-                  <h3 class="text-xl font-semibold text-gray-900">Sort by</h3>
-                  <button
-                    class="absolute right-6"
-                    @click="openSortByDialog = false"
-                  >
-                    <div class="rounded-full border-2 p-1">
-                      <XIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
-                    </div>
-                  </button>
-                </div>
+          <img
+            :src="item.icon"
+            class="-ml-1 mr-1 h-5 w-5 rounded text-gray-500"
+            alt=""
+          />
+          {{ item.label }}
+        </FlatButton>
+      </div>
+    </div>
 
-                <RadioGroup
-                  v-model="selectedSort"
-                  onChange="{setPlan}"
-                  class="w-full"
+    <div class="flex gap-4 bg-gray-50">
+      <button
+        type="button"
+        class="w-full rounded-md border border-orange-500/80 p-3 font-semibold text-orange-500/80 hover:opacity-80"
+        @click="clearAllFilter()"
+        ref="cancelButtonRef"
+      >
+        Clear all
+      </button>
+
+      <button
+        type="button"
+        class="w-full items-center justify-center rounded-md border border-transparent bg-red-600 px-5 py-3 text-base font-medium text-white hover:bg-red-700"
+        @click="applyFilter()"
+        ref="cancelButtonRef"
+      >
+        Apply filters
+      </button>
+    </div>
+  </CustomDialog>
+
+  <CustomDialog
+    :show="openSortByDialog"
+    title="Sort by"
+    @onClose="openSortByDialog = false"
+  >
+    <RadioGroup v-model="selectedSort" onChange="{setPlan}" class="w-full">
+      <RadioGroupLabel class="sr-only"> Choose a sort option </RadioGroupLabel>
+      <div class="flex flex-col gap-0">
+        <RadioGroupOption
+          as="template"
+          v-for="(item, i) in sorts"
+          :key="i"
+          :value="item"
+          v-slot="{ checked }"
+        >
+          <div
+            class="group relative flex cursor-pointer items-center justify-start border-b px-4 py-3 text-sm font-medium focus:outline-none sm:flex-1"
+          >
+            <RadioGroupLabel as="span" class="w-full">
+              <div class="flex items-center gap-2">
+                <input
+                  :checked="checked"
+                  name="size-radios"
+                  type="radio"
+                  class="h-4 w-4 border-gray-500 text-orange-500/80 focus:ring-orange-500/80"
+                />
+                <span
+                  :class="[
+                    checked ? 'font-bold' : 'font-light',
+                    'ml-2 block text-base text-gray-700',
+                  ]"
+                  >{{ item.label }}</span
                 >
-                  <RadioGroupLabel class="sr-only">
-                    Choose a sort option
-                  </RadioGroupLabel>
-                  <div class="flex flex-col gap-0">
-                    <RadioGroupOption
-                      as="template"
-                      v-for="(item, i) in sorts"
-                      :key="i"
-                      :value="item"
-                      v-slot="{ checked }"
-                    >
-                      <div
-                        class="group relative flex cursor-pointer items-center justify-start border-b px-4 py-3 text-sm font-medium focus:outline-none sm:flex-1"
-                      >
-                        <RadioGroupLabel as="span" class="w-full">
-                          <div class="flex items-center gap-2">
-                            <input
-                              :checked="checked"
-                              name="size-radios"
-                              type="radio"
-                              class="h-4 w-4 border-gray-500 text-orange-500/80 focus:ring-orange-500/80"
-                            />
-                            <span
-                              :class="[
-                                checked ? 'font-bold' : 'font-light',
-                                'ml-2 block text-base text-gray-700',
-                              ]"
-                              >{{ item.label }}</span
-                            >
-                          </div>
-                        </RadioGroupLabel>
-                        <span
-                          :class="['pointer-events-none absolute -inset-px']"
-                          aria-hidden="true"
-                        />
-                      </div>
-                    </RadioGroupOption>
-                  </div>
-                </RadioGroup>
               </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
+            </RadioGroupLabel>
+            <span
+              :class="['pointer-events-none absolute -inset-px']"
+              aria-hidden="true"
+            />
+          </div>
+        </RadioGroupOption>
       </div>
-    </Dialog>
-  </TransitionRoot>
+    </RadioGroup>
+  </CustomDialog>
 </template>
