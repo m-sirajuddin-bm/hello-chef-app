@@ -1,5 +1,6 @@
 <script setup>
 import CalorieSmartIcon from "@/assets/icons/calorie_smart.svg";
+import CalorieIcon from "@/assets/icons/calorie.svg";
 import ChickenIcon from "@/assets/icons/chicken.svg";
 import FamilyFriendlyIcon from "@/assets/icons/family_friendly.svg";
 import FishIcon from "@/assets/icons/fish.svg";
@@ -10,6 +11,7 @@ import QuickEasyIcon from "@/assets/icons/quick_easy.svg";
 import VeganIcon from "@/assets/icons/vegan.svg";
 import VegetarianIcon from "@/assets/icons/vegetarian.svg";
 import { ref, toRefs } from "vue";
+import { ClockIcon } from "@heroicons/vue/outline";
 
 const props = defineProps({
   product: {
@@ -100,36 +102,27 @@ init();
         </h3>
       </div>
       <div class="flex flex-col justify-end gap-2 sm:h-20">
-        <div class="flex gap-2 text-sm text-gray-600">
-          <span>{{ product.nutritions[0].value }} Cals</span>
-          <span>|</span>
-          <span>{{ product.cookingTime }} Min</span>
-        </div>
         <div class="flex text-sm text-gray-600">
           <div v-for="(feature, i) in features" :key="i">
             <div v-if="featuresIcon[feature]" class="flex">
-              <img
-                :src="featuresIcon[feature]"
-                class="h-5 w-5 rounded text-gray-500"
-                alt=""
-              />
+              <img :src="featuresIcon[feature]" class="h-5 w-5" alt="" />
 
-              <div v-if="features.length - 1 !== i" class="mx-1 text-gray-700">
+              <div v-if="features.length - 1 !== i" class="mx-1 text-gray-300">
                 |
               </div>
             </div>
+          </div>
+        </div>
 
-            <!-- <div
-              v-if="!featuresIcon[feature]"
-              :class="[labelColors[feature], 'truncate']"
-            >
-              {{ feature }}
-              <span
-                v-if="features.length - 1 !== i"
-                class="text-gray-700 mx-0.5 font-semibold"
-                >&middot;
-              </span>
-            </div> -->
+        <div class="flex gap-1 text-sm text-gray-600">
+          <div class="flex items-center gap-1">
+            <ClockIcon class="h-4 w-4" aria-hidden="true" />
+            {{ product.cookingTime }}
+          </div>
+          <span class="text-gray-300">|</span>
+          <div class="flex items-center gap-1">
+            <img :src="CalorieIcon" class="h-5 w-5" alt="" />
+            {{ product.nutritions[0].value }} cals
           </div>
         </div>
       </div>
