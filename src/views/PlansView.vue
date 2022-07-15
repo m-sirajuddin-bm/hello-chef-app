@@ -14,12 +14,12 @@ onUnmounted(() => {
 <template>
   <div class="min-h-full">
     <main>
-      <div class="max-w-6xl mx-auto py-8 sm:px-6 lg:px-8">
-        <h1 class="text-3xl font-semibold text-gray-700 text-center pb-8">
+      <div class="mx-auto max-w-6xl py-8 sm:px-6 lg:px-8">
+        <h1 class="pb-8 text-center text-3xl font-semibold text-gray-700">
           Personalise Your Box
         </h1>
 
-        <div class="flex flex-col gap-3 w-full lg:flex-row">
+        <div class="flex w-full flex-col gap-3 lg:flex-row">
           <SizeBox />
           <RecipeBox />
         </div>
