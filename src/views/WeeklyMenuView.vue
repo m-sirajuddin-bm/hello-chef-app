@@ -96,6 +96,7 @@ const filters = ref([
     icon: VeganIcon,
     selected: false,
     disabled: false,
+    filtered: false,
   },
   {
     type: "protein",
@@ -104,6 +105,7 @@ const filters = ref([
     icon: FishIcon,
     selected: false,
     disabled: false,
+    filtered: false,
   },
   {
     type: "protein",
@@ -112,6 +114,7 @@ const filters = ref([
     icon: ChickenIcon,
     selected: false,
     disabled: false,
+    filtered: false,
   },
   {
     type: "protein",
@@ -120,6 +123,7 @@ const filters = ref([
     icon: MeatIcon,
     selected: false,
     disabled: false,
+    filtered: false,
   },
   {
     type: "feature",
@@ -128,6 +132,7 @@ const filters = ref([
     icon: LowCarbIcon,
     selected: false,
     disabled: false,
+    filtered: false,
   },
   {
     type: "feature",
@@ -136,6 +141,7 @@ const filters = ref([
     icon: CalorieSmartIcon,
     selected: false,
     disabled: false,
+    filtered: false,
   },
   {
     type: "feature",
@@ -144,6 +150,7 @@ const filters = ref([
     icon: FamilyFriendlyIcon,
     selected: false,
     disabled: false,
+    filtered: false,
   },
   {
     type: "feature",
@@ -152,6 +159,7 @@ const filters = ref([
     icon: QuickEasyIcon,
     selected: false,
     disabled: false,
+    filtered: false,
   },
   {
     type: "feature",
@@ -160,6 +168,7 @@ const filters = ref([
     icon: WeeklyClassicIcon,
     selected: false,
     disabled: false,
+    filtered: false,
   },
   {
     type: "feature",
@@ -168,6 +177,7 @@ const filters = ref([
     icon: GourmetIcon,
     selected: false,
     disabled: false,
+    filtered: false,
   },
 ]);
 const mainProteinsFilters = ref(
@@ -304,16 +314,56 @@ function selectRecipeFeature(item) {
   item.selected = !item.selected;
 }
 
+function handleOpenFilterDialog() {
+  openFilterDialog.value = true;
+
+  // set all the filtered as selected
+  // this is to make sure, only filtered are selected
+  // otherwise user can simply select the filter and
+  // close the dialog without applying filter
+  filters.value.forEach((item) => {
+    item.selected = item.filtered;
+  });
+}
+
+function closeFilterDialog() {
+  openFilterDialog.value = false;
+  if (!filterApplied.value) {
+    clearFilter();
+  }
+}
+
+function clearAllFilter() {
+  clearFilter();
+  filterApplied.value = false;
+  openFilterDialog.value = false;
+}
+
 function applyFilter() {
+  openFilterDialog.value = false;
+
+  // set all the filtered to false and select based on selected
+  filters.value.forEach((item) => {
+    item.filtered = false;
+  });
+
   // get the protein filters mapped to filterType
   const proteinFilters = filters.value
     .filter((f) => f.selected && f.type === "protein")
-    .map((m) => m.filterType.toLowerCase());
+    .map((m) => {
+      // set filtered to true to reselect the filtered after closing the filter dialog
+      m.filtered = true;
+      return m.filterType.toLowerCase();
+    });
 
   // get feature filters mapped to filterType
   const featureFilters = filters.value
     .filter((f) => f.selected && f.type === "feature")
-    .map((m) => m.filterType);
+    .map((m) => {
+      // set filtered to true to reselect the filtered after closing the filter dialog
+      m.filtered = true;
+      return m.filterType;
+    });
 
   // after clear all filter and apply
   if (!proteinFilters.length && !featureFilters.length) {
@@ -358,6 +408,7 @@ function clearFilter() {
   filters.value.forEach((item) => {
     item.selected = false;
     item.disabled = false;
+    item.filtered = false;
   });
   recipeFeatureFilter = {};
   filteredProducts.value = [];
@@ -365,7 +416,7 @@ function clearFilter() {
 </script>
 
 <template>
-  <div class="min-h-full bg-white sm:bg-gray-100">
+  <div class="h-[calc(100%-64px)] bg-white sm:bg-gray-100">
     <main>
       <div
         class="flex flex-col items-center justify-center gap-2 bg-white pt-6 pb-2 shadow-sm sm:flex-row"
@@ -397,7 +448,7 @@ function clearFilter() {
       <div
         class="sticky top-0 z-10 flex h-16 items-center justify-start gap-2 overflow-x-auto whitespace-nowrap bg-white/95 p-3"
       >
-        <FlatButton @onClick="openFilterDialog = true" class="relative">
+        <FlatButton @onClick="handleOpenFilterDialog()" class="relative">
           Filters
 
           <span
@@ -447,6 +498,10 @@ function clearFilter() {
 
       <div class="mx-auto max-w-[1440px] sm:py-8 sm:px-6 lg:px-8">
         <div
+          v-if="
+            (filterApplied && filteredProducts.length) ||
+            (!filterApplied && products.length)
+          "
           class="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 sm:gap-y-8 md:grid-cols-2 lg:grid-cols-4 xl:gap-x-8"
         >
           <div
@@ -458,33 +513,30 @@ function clearFilter() {
           </div>
         </div>
 
-        <h3
-          v-if="(filterApplied && !filteredProducts.length) || !products.length"
-          class="w-full text-center text-3xl font-semibold text-gray-600"
-        >
-          No products to display!
-        </h3>
+        <div class="py-12">
+          <h3
+            v-if="
+              (filterApplied && !filteredProducts.length) || !products.length
+            "
+            class="w-full text-center text-3xl font-semibold text-gray-600"
+          >
+            No recipes to display!
+          </h3>
+        </div>
       </div>
     </main>
   </div>
 
   <TransitionRoot as="template" :show="openFilterDialog">
-    <Dialog
-      as="div"
-      class="relative z-10"
-      @close="
-        openFilterDialog = false;
-        !filterApplied ? clearFilter() : '';
-      "
-    >
+    <Dialog as="div" class="relative z-10" @close="closeFilterDialog()">
       <TransitionChild
         as="template"
         enter="ease-out duration-300"
-        enter-from="opacity-0 translate-y-full"
-        enter-to="opacity-100 translate-y-0"
+        enter-from="opacity-0"
+        enter-to="opacity-100"
         leave="ease-in duration-300"
-        leave-from="opacity-100 translate-y-0"
-        leave-to="opacity-0 translate-y-full"
+        leave-from="opacity-100"
+        leave-to="opacity-0"
       >
         <div class="fixed inset-0 bg-black bg-opacity-60 transition-opacity" />
       </TransitionChild>
@@ -496,11 +548,11 @@ function clearFilter() {
           <TransitionChild
             as="template"
             enter="ease-out duration-300"
-            enter-from="opacity-0 translate-y-full"
-            enter-to="opacity-100 translate-y-0"
+            enter-from="opacity-0"
+            enter-to="opacity-100"
             leave="ease-in duration-300"
-            leave-from="opacity-100 translate-y-0"
-            leave-to="opacity-0 translate-y-full"
+            leave-from="opacity-100"
+            leave-to="opacity-0"
           >
             <DialogPanel
               class="relative w-full transform overflow-hidden rounded-t-2xl bg-white text-left shadow-xl transition-all sm:max-w-lg sm:rounded-2xl"
@@ -510,13 +562,7 @@ function clearFilter() {
               >
                 <div class="flex items-center justify-center">
                   <h3 class="text-xl font-semibold text-gray-900">Filter by</h3>
-                  <button
-                    class="absolute right-6"
-                    @click="
-                      openFilterDialog = false;
-                      !filterApplied ? clearFilter() : '';
-                    "
-                  >
+                  <button class="absolute right-6" @click="closeFilterDialog()">
                     <div class="rounded-full border-2 p-1">
                       <XIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
                     </div>
@@ -573,11 +619,7 @@ function clearFilter() {
                   <button
                     type="button"
                     class="w-full rounded-md border border-orange-500/80 p-3 font-semibold text-orange-500/80 hover:opacity-80"
-                    @click="
-                      clearFilter();
-                      filterApplied = false;
-                      openFilterDialog = false;
-                    "
+                    @click="clearAllFilter()"
                     ref="cancelButtonRef"
                   >
                     Clear all
@@ -586,10 +628,7 @@ function clearFilter() {
                   <button
                     type="button"
                     class="w-full items-center justify-center rounded-md border border-transparent bg-red-600 px-5 py-3 text-base font-medium text-white hover:bg-red-700"
-                    @click="
-                      applyFilter();
-                      openFilterDialog = false;
-                    "
+                    @click="applyFilter()"
                     ref="cancelButtonRef"
                   >
                     Apply filters
@@ -608,11 +647,11 @@ function clearFilter() {
       <TransitionChild
         as="template"
         enter="ease-out duration-300"
-        enter-from="opacity-0 translate-y-full"
-        enter-to="opacity-100 translate-y-0"
+        enter-from="opacity-0"
+        enter-to="opacity-100"
         leave="ease-in duration-300"
-        leave-from="opacity-100 translate-y-0"
-        leave-to="opacity-0 translate-y-full"
+        leave-from="opacity-100"
+        leave-to="opacity-0"
       >
         <div class="fixed inset-0 bg-black bg-opacity-60 transition-opacity" />
       </TransitionChild>
@@ -624,11 +663,11 @@ function clearFilter() {
           <TransitionChild
             as="template"
             enter="ease-out duration-300"
-            enter-from="opacity-0 translate-y-full"
-            enter-to="opacity-100 translate-y-0"
+            enter-from="opacity-0"
+            enter-to="opacity-100"
             leave="ease-in duration-300"
-            leave-from="opacity-100 translate-y-0"
-            leave-to="opacity-0 translate-y-full"
+            leave-from="opacity-100"
+            leave-to="opacity-0"
           >
             <DialogPanel
               class="relative w-full transform overflow-hidden rounded-t-2xl bg-white text-left shadow-xl transition-all sm:max-w-lg sm:rounded-2xl"
