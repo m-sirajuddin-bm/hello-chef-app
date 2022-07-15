@@ -273,7 +273,18 @@ function handleOpenFilterDialog() {
   });
 }
 
+function handleFilterShortcut(item) {
+  if (item.type === "protein") {
+    selectMainProtein(item);
+  } else {
+    selectRecipeFeature(item);
+  }
+  applyFilter();
+}
+
 function selectMainProtein(item, force = false) {
+  if (item.type !== "protein") return;
+
   // if force, do not unselected
   if (!force) item.selected = !item.selected;
 
@@ -382,6 +393,7 @@ function applyFilter() {
     return;
   }
 
+  let proteinFilterApplied = false;
   // if there is protein filter then check for product's mainProtein names
   if (proteinFilters.length) {
     filteredProducts.value = products.value.filter((product) => {
@@ -389,15 +401,14 @@ function applyFilter() {
         product.mainProtein?.name.toLowerCase().startsWith(filterItem),
       );
     });
+    proteinFilterApplied = true;
   }
 
   // if there is feature filter then check for product's features names
   if (featureFilters.length) {
     // if already proteinFilters is applied then filter items from filteredProducts
     // else filter from main products
-    const productsToFilter = filteredProducts.value.length
-      ? filteredProducts
-      : products;
+    const productsToFilter = proteinFilterApplied ? filteredProducts : products;
 
     filteredProducts.value = productsToFilter.value.filter((product) => {
       return featureFilters.some((filterItem) => {
@@ -458,7 +469,7 @@ function clearFilter() {
       </div>
 
       <div
-        class="sticky top-0 z-10 flex h-16 items-center justify-start gap-2 overflow-x-auto whitespace-nowrap bg-white/95 p-3"
+        class="sticky top-0 z-10 flex items-center justify-start gap-2 overflow-x-auto whitespace-nowrap bg-white/95 p-3"
       >
         <FlatButton @onClick="handleOpenFilterDialog()" class="relative">
           Filters
@@ -484,6 +495,29 @@ function clearFilter() {
             aria-hidden="true"
           />
         </FlatButton>
+
+        <div v-if="filterApplied" class="flex items-center justify-start gap-2">
+          <FlatButton
+            v-for="(item, i) in filters.filter((f) => f.filtered)"
+            :key="i"
+            :selected="true"
+          >
+            <img
+              :src="item.icon"
+              class="-ml-1 mr-1 h-5 w-5 max-w-fit rounded text-gray-500"
+              :alt="item.label"
+            />
+
+            {{ item.label }}
+
+            <button type="button" @click="handleFilterShortcut(item)">
+              <XIcon
+                class="-mr-1 ml-2 h-5 w-5 text-orange-500/80 hover:opacity-80"
+                aria-hidden="true"
+              />
+            </button>
+          </FlatButton>
+        </div>
       </div>
 
       <div v-if="filterApplied" class="bg-white px-3">
