@@ -72,6 +72,8 @@ const init = async () => {
   if (product.value.weeklyClassic) {
     features.value.push("Weekly classic");
   }
+
+  features.value.sort((a, b) => a - b);
 };
 
 init();
