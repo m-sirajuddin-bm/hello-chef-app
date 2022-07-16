@@ -335,7 +335,7 @@ function clearFilter() {
       </div>
 
       <div
-        class="sticky top-0 z-10 flex items-center justify-start gap-2 overflow-x-auto whitespace-nowrap bg-white/95 p-3"
+        class="invisible-scroll sticky top-0 z-10 flex items-center justify-start gap-2 overflow-x-auto whitespace-nowrap bg-white/95 p-3"
       >
         <FlatButton @onClick="handleOpenFilterDialog()" class="relative">
           Filters
