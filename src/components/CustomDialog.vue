@@ -36,18 +36,18 @@ defineProps({
         <div class="fixed inset-0 bg-black bg-opacity-60 transition-opacity" />
       </TransitionChild>
 
-      <div class="fixed inset-0 z-10 overflow-y-auto">
+      <div class="fixed inset-0 z-10">
         <div
           class="flex min-h-full items-end justify-center text-center sm:items-center"
         >
           <TransitionChild
             as="template"
-            enter="ease-out duration-300"
-            enter-from="opacity-0"
-            enter-to="opacity-100"
-            leave="ease-in duration-300"
-            leave-from="opacity-100"
-            leave-to="opacity-0"
+            enter="transition duration-300 ease-out"
+            enter-from="translate-y-full opacity-0 sm:translate-y-0"
+            enter-to="translate-y-0 opacity-100 sm:translate-y-0"
+            leave="transition duration-300 ease-in"
+            leave-from="translate-y-0 opacity-100 sm:translate-y-0"
+            leave-to="translate-y-full opacity-0 sm:translate-y-0"
           >
             <DialogPanel
               class="relative w-full transform overflow-hidden rounded-t-2xl bg-white text-left shadow-xl transition-all sm:max-w-lg sm:rounded-2xl"
