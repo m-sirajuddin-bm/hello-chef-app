@@ -24,7 +24,7 @@ defineProps({
       disabled ? 'border-dashed text-gray-400/90 line-through' : '',
     ]"
     :style="disabled ? 'filter: grayscale(100%)' : ''"
-    @click="() => emits('onClick')"
+    @click="emits('onClick')"
   >
     <slot></slot>
   </button>

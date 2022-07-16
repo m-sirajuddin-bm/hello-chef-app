@@ -406,7 +406,7 @@ function clearFilter() {
         </div>
       </div>
 
-      <div class="sticky top-[62px] z-10 border-b-2"></div>
+      <div class="sticky top-[60px] z-10 border-b-2"></div>
 
       <div class="mx-auto max-w-[1440px] sm:py-8 sm:px-6 lg:px-8">
         <div
