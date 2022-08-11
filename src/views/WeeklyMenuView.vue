@@ -25,7 +25,7 @@ const getWeek = () => {
     startDate = new Date(new Date().setDate(startDate.getDate() - diff));
   } else if (day < 4) {
     const diff = 4 - day;
-    startDate = new Date(new Date().setDate(startDate.getDate() - diff));
+    startDate = new Date(new Date().setDate(startDate.getDate() + diff));
   }
 
   for (let i = 0; i < 4; i++) {
