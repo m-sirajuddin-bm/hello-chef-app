@@ -3,7 +3,7 @@ import FilterIcon from "@/assets/icons/filter.svg";
 import CustomDialog from "@/components/CustomDialog.vue";
 import FlatButton from "@/components/FlatButton.vue";
 import RecipeCard from "@/components/RecipeCard.vue";
-import { BASE_URL, FILTERS, SORTS, WEEKS } from "@/constants";
+import { BASE_URL, FILTERS, SORTS } from "@/constants";
 import { flatDeep } from "@/utils";
 import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
 import { ChevronDownIcon, XIcon } from "@heroicons/vue/outline";
