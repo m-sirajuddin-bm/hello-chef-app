@@ -10,21 +10,6 @@ import QuickEasyIcon from "@/assets/icons/quick_easy.svg";
 import VeganIcon from "@/assets/icons/vegan.svg";
 import WeeklyClassicIcon from "@/assets/icons/weekly_classic.svg";
 
-export const WEEKS = [
-  {
-    label: "7 - 13",
-    date: "2022-07-07",
-  },
-  {
-    label: "14 - 20",
-    date: "2022-07-14",
-  },
-  {
-    label: "21 - 27",
-    date: "2022-07-21",
-  },
-];
-
 export const SORTS = [
   {
     label: "Default",

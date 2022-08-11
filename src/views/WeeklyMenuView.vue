@@ -1,5 +1,6 @@
 <script setup>
 import FilterIcon from "@/assets/icons/filter.svg";
+import CustomDialog from "@/components/CustomDialog.vue";
 import FlatButton from "@/components/FlatButton.vue";
 import RecipeCard from "@/components/RecipeCard.vue";
 import { BASE_URL, FILTERS, SORTS, WEEKS } from "@/constants";
@@ -7,7 +8,6 @@ import { flatDeep } from "@/utils";
 import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
 import { ChevronDownIcon, XIcon } from "@heroicons/vue/outline";
 import { onMounted, ref, watch } from "vue";
-import CustomDialog from "@/components/CustomDialog.vue";
 
 onMounted(async () => {
   await getData(selectedWeek.value.date);
@@ -16,7 +16,38 @@ onMounted(async () => {
 const products = ref([]);
 const filteredProducts = ref([]);
 
-const weeks = ref(WEEKS);
+const getWeek = () => {
+  const list = [];
+  let startDate = new Date();
+  const day = startDate.getDay();
+  if (day > 4) {
+    const diff = day - 4;
+    startDate = new Date(new Date().setDate(startDate.getDate() - diff));
+  } else if (day < 4) {
+    const diff = 4 - day;
+    startDate = new Date(new Date().setDate(startDate.getDate() - diff));
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const endDate = new Date().setDate(startDate.getDate() + 6);
+    const startDay = startDate.format("dd");
+    const endDay = new Date(endDate).format("dd");
+    const nextMonth = new Date(new Date().setMonth(startDate.getDate() + 1));
+    const month =
+      startDay > endDay
+        ? `${startDate.format("MMM")} - ${nextMonth.format("MMM")}`
+        : startDate.format("MMM");
+    list.push({
+      label: `${startDay} - ${endDay}`,
+      date: `${startDate.format("yyyy-MM-dd")}`,
+      month,
+    });
+    startDate = new Date(startDate.setDate(startDate.getDate() + 7));
+  }
+
+  return list;
+};
+const weeks = ref(getWeek());
 const selectedWeek = ref(WEEKS[0]);
 
 const openSortByDialog = ref(false);
@@ -44,7 +75,14 @@ async function getData(date) {
       `${BASE_URL}/weekly-menus/find?by=startDate&value=${date}&withNextWeek=1&with=recipes.mainProtein`,
     );
     const json = await response.json();
-    products.value = json?.data.weeklyMenu.recipes;
+    // products.value = json?.data.weeklyMenu.recipes;
+    const dt = json?.data?.weeklyMenu?.recipes;
+
+    if (!dt) {
+      return;
+    }
+
+    products.value = Object.values(dt).map((a) => a[0].recipe);
 
     // triger filter, if applied
     if (filterApplied.value) {
@@ -327,8 +365,11 @@ function clearFilter() {
                   selectedWeek === week ? 'text-white' : 'text-orange-700',
                 ]"
               >
-                {{ week.label }}</span
-              >
+                {{ week.label }}
+                <span class="block font-medium">
+                  {{ week.month }}
+                </span>
+              </span>
             </button>
           </div>
         </div>
