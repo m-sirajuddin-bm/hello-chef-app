@@ -48,7 +48,7 @@ const getWeek = () => {
   return list;
 };
 const weeks = ref(getWeek());
-const selectedWeek = ref(WEEKS[0]);
+const selectedWeek = ref(weeks.value[0]);
 
 const openSortByDialog = ref(false);
 const sortApplied = ref(false);
